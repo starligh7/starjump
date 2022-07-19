@@ -5,19 +5,23 @@ public class Player : MonoBehaviour
     public float mouseSensitivity = 100.0f;
     public float clampAngle = 80.0f;
     public float moveSpeed = 1.0f;
+    public float jumpPower = 1.0f;
+    public float gravity = 9.8f;
+
+    public Vector3 velocity;
 
     private float rotY = 0.0f; // rotation around the up/y axis
     private float rotX = 0.0f; // rotation around the right/x axis
 
-    private Rigidbody rigid;
+    private CharacterController controller;
 
-    void Start()
+    private void Start()
     {
         cameraInit();
-        rigid = GetComponent<Rigidbody>();
+        controller = GetComponent<CharacterController>();
     }
 
-    void Update()
+    private void Update()
     {
         look();
         move();
@@ -46,18 +50,24 @@ public class Player : MonoBehaviour
         transform.rotation = localRotation;
     }
 
+    private Vector3 moveDir = Vector3.zero;
     private void move()
     {
-        float yAngle = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
 
-        Debug.Log(yAngle / Mathf.PI);
+        if (controller.isGrounded)
+        {
+            moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            moveDir = Quaternion.Euler(0, transform.rotation.y, 0) * moveDir;
 
-        float xPos = Mathf.Sin(yAngle);
-        float zPos = Mathf.Cos(yAngle);
+            moveDir = transform.TransformDirection(moveDir);
+            moveDir *= moveSpeed;
 
-        Vector3 velocity = new Vector3(xPos, 0, zPos);
-        Debug.Log(velocity);
+            if (Input.GetButton("Jump"))
+                moveDir.y = jumpPower;
+        }
 
-        transform.position += velocity * moveSpeed * Time.deltaTime;
+        moveDir.y -= Time.deltaTime * gravity;
+
+        controller.Move(moveDir * Time.deltaTime);
     }
 }
