@@ -25,12 +25,26 @@ public class Player : MonoBehaviour
         cameraInit();
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
+
+        mainCamera = Camera.main;
+        thirdCamera = GameObject.Find("ThirdCamera").GetComponent<Camera>();
     }
 
     private void Update()
     {
         look();
         move();
+
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            toggleCamera();
+        }
+
+        if (transform.position.y <= 0)
+        {
+            velocity = Vector3.zero;
+            transform.position = Vector3.zero;
+        }
     }
 
     private void cameraInit()
@@ -56,7 +70,7 @@ public class Player : MonoBehaviour
         rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
 
         Debug.Log(new Vector2(rotX, rotY));
-        
+
         Quaternion localRotation = Quaternion.Euler(0, rotY, 0);
         transform.rotation = localRotation;
 
@@ -73,7 +87,7 @@ public class Player : MonoBehaviour
 
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = 0f;
+            velocity.y = 0;
         }
 
         float x = Input.GetAxisRaw("Horizontal");
@@ -90,7 +104,13 @@ public class Player : MonoBehaviour
 
         move.Normalize();
 
-        controller.Move(move * moveSpeed * Time.deltaTime);
+        CollisionFlags flag = controller.Move(move * moveSpeed * Time.deltaTime);
+        Debug.Log(flag);
+
+        if ((CollisionFlags.CollidedAbove & flag) != 0)
+        {
+            velocity.y = 0;
+        }
 
         if (isGrounded)
         {
@@ -106,5 +126,25 @@ public class Player : MonoBehaviour
 
         velocity.y -= gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    private bool isThridPerson = false;
+    private Camera mainCamera;
+    private Camera thirdCamera;
+
+    private void toggleCamera()
+    {
+        if (isThridPerson)
+        {
+            mainCamera.enabled = true;
+            thirdCamera.enabled = false;
+        }
+        else
+        {
+            mainCamera.enabled = false;
+            thirdCamera.enabled = true;
+        }
+
+        isThridPerson = !isThridPerson;
     }
 }
