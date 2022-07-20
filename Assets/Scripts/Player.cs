@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro.Examples;
 
 public class Player : MonoBehaviour
 {
@@ -26,8 +27,7 @@ public class Player : MonoBehaviour
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
 
-        mainCamera = Camera.main;
-        thirdCamera = GameObject.Find("ThirdCamera").GetComponent<Camera>();
+        mainCamera = Camera.main.GetComponent<CameraController>();
     }
 
     private void Update()
@@ -129,22 +129,23 @@ public class Player : MonoBehaviour
     }
 
     private bool isThridPerson = false;
-    private Camera mainCamera;
-    private Camera thirdCamera;
+    private CameraController mainCamera;
 
     private void toggleCamera()
     {
+        isThridPerson = !isThridPerson;
+
         if (isThridPerson)
         {
             mainCamera.enabled = true;
-            thirdCamera.enabled = false;
+            mainCamera.gameObject.transform.SetParent(null);
         }
         else
         {
             mainCamera.enabled = false;
-            thirdCamera.enabled = true;
+            mainCamera.gameObject.transform.SetParent(head.transform);
+            mainCamera.gameObject.transform.localPosition = new Vector3(0, 0.01399f, -0.00156f);
+            mainCamera.gameObject.transform.localRotation = Quaternion.identity;
         }
-
-        isThridPerson = !isThridPerson;
     }
 }
