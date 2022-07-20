@@ -54,7 +54,6 @@ public class Player : MonoBehaviour
         rotY = rot.y;
         rotX = rot.x;
 
-        Cursor.visible = false;
     }
 
     private void look()
@@ -78,6 +77,19 @@ public class Player : MonoBehaviour
         headRot.x = rotX;
 
         head.transform.localRotation = Quaternion.Euler(headRot);
+
+        //cursor lock
+
+        if (EscScript.GameIsPaused)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 
     private Vector3 moveDir = Vector3.zero;
@@ -134,6 +146,7 @@ public class Player : MonoBehaviour
     private void toggleCamera()
     {
         isThridPerson = !isThridPerson;
+        Camera.main.cullingMask ^= 1 << 3;
 
         if (isThridPerson)
         {
