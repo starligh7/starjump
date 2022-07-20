@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
         if (transform.position.y <= 0)
         {
             velocity = Vector3.zero;
-            transform.position = Vector3.zero;
+            transform.position = GameManager.currentCheckPoint.transform.position;
         }
     }
 
@@ -67,8 +67,6 @@ public class Player : MonoBehaviour
 
 
         rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
-
-        Debug.Log(new Vector2(rotX, rotY));
 
         Quaternion localRotation = Quaternion.Euler(0, rotY, 0);
         transform.rotation = localRotation;
